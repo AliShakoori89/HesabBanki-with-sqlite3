@@ -56,9 +56,9 @@ class DumpForm(tk.Frame):
         sheet=sheet_field.get()
         sheet=int(sheet)
         id_search=id_field.get()
-        if self.sql_obj.open_search(self, id_search):
-            intended_suply=self.sql_obj.open_search(self, id_search)
-            if self.sql_obj.sub_sheets(self,intended_suply,id_search,sheet):
+        if self.sql_obj.open_search(id_search):
+            intended_suply=self.sql_obj.open_search(id_search)
+            if self.sql_obj.sub_sheets(intended_suply,id_search,sheet):
                 showinfo("notification box", "successfully operation")
             else:
                 showinfo("notification box", "failed operation because not enough money ")
@@ -81,7 +81,7 @@ class WithdrawForm(tk.Frame):
 
     def withdraw(self,id_field):
         id_search=id_field.get()
-        if self.sql_obj.withdraw(self, id_search):
+        if self.sql_obj.withdraw(id_search):
             showinfo("notification box", "successfully operation")
         else:
             showinfo("notification box", "failed operation because customer not found ")
@@ -93,7 +93,6 @@ class ShowForm(tk.Frame):
         show_window = tk.Toplevel(self.master)
         self.sql_obj=SQLHandler()
         show_window.title("show box")
-    # def show(self):
         list_name=self.sql_obj.show()
         n=len(list_name)
         for i in range(0,n):
@@ -148,40 +147,8 @@ class MainGUI:
         supply_label = Label(self.master, text="supply: ")
         supply_label.grid(row=4, column=0, sticky=W)
 
-        def add_button(self, name_field, last_name_field, id_field, bank_account_field, supply_field):
-    
-            try:
-                id_field=int(id_field.get())
-            except ValueError:
-                showinfo("notification box", "please input true data type and enter ID number again")
-            try:
-                name_field=str(name_field.get())
-            except ValueError:
-                showinfo("notification box", "please input true data type and enter name again")
-            try:
-                last_name_field=str(last_name_field.get())
-            except ValueError:
-                showinfo("notification box", "please input true data type and enter lastname again")
-            try:
-                bank_account_field=int(bank_account_field.get())
-            except ValueError:
-                showinfo("notification box", "please input true data type and enter bank account number again ")
-            try:
-                supply_field=int(supply_field.get())
-            except ValueError:
-                showinfo("notification box", "please input true data type and enter supply again")
-
-            data_list=[id_field,name_field,last_name_field,bank_account_field,supply_field]
-
-            SQLHandler.insert_table(self,data_list)
-            showinfo("notification box", "customer adding successfully")
-
-
-        create_add_window_action_with_arg = partial(add_button, self.master, name_field, last_name_field, id_field,
-                                                    account_number_field,
-                                                    supply_field)
+        create_add_window_action_with_arg = partial(self.add_button, name_field, last_name_field, id_field,account_number_field,supply_field)
         Button(self.master, text='Add', command=create_add_window_action_with_arg).place(x=10, y=145)
-
 
         create_deposit_window_action_with_arg = partial(create_deposit_window, self.master)
         Button(self.master, text='Deposit', command=create_deposit_window_action_with_arg).place(x=45, y=145)
@@ -195,7 +162,36 @@ class MainGUI:
         create_show_window_action_with_arg = partial(create_show_list,self.master)
         Button(self.master,text="Show",command=create_show_window_action_with_arg).place(x=207,y=145)
         
-        # self.master.mainloop()
+
+    def add_button(self, name_field, last_name_field, id_field, bank_account_field, supply_field):
+
+        try:
+            id_field=int(id_field.get())
+        except ValueError:
+            showinfo("notification box", "please input true data type and enter ID number again")
+        try:
+            name_field=str(name_field.get())
+        except ValueError:
+            showinfo("notification box", "please input true data type and enter name again")
+        try:
+            last_name_field=str(last_name_field.get())
+        except ValueError:
+            showinfo("notification box", "please input true data type and enter lastname again")
+        try:
+            bank_account_field=int(bank_account_field.get())
+        except ValueError:
+            showinfo("notification box", "please input true data type and enter bank account number again ")
+        try:
+            supply_field=int(supply_field.get())
+        except ValueError:
+            showinfo("notification box", "please input true data type and enter supply again")
+
+        data_list=[id_field,name_field,last_name_field,bank_account_field,supply_field]
+
+        if self.sql_obj.insert_table(data_list,id_field):
+            showinfo("notification box", "customer adding successfully")
+        else:
+            showinfo("notification box", "customer existe ago")
 
 main=MainGUI()
 main.master.mainloop()
